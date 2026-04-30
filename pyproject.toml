@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "envault"
+version = "0.1.0"
+description = "CLI tool to manage and encrypt per-project .env files with git-friendly diffs"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "click>=8.1",
+    "cryptography>=42.0",
+]
+
+[project.scripts]
+envault = "envault.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["envault*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
