@@ -49,6 +49,15 @@ def test_diff_vaults_no_changes():
     assert not d.has_changes
 
 
+def test_diff_vaults_empty_vaults():
+    """Diffing two empty vaults should report no changes."""
+    d = diff_vaults({}, {})
+    assert not d.has_changes
+    assert d.added == []
+    assert d.removed == []
+    assert d.changed == []
+
+
 def test_snapshot_keys_is_sorted_json():
     vault = {"Z": "v", "A": "v", "M": "v"}
     result = snapshot_keys(vault)
@@ -103,3 +112,12 @@ def test_snapshot_diff_summary_shows_added(tmp_path):
     summary = snapshot_diff_summary(old_keys, new_vault)
     assert "+ FRESH" in summary
     assert "- " not in summary
+
+
+def test_snapshot_diff_summary_shows_removed(tmp_path):
+    """Keys present in the old snapshot but absent from the new vault should be marked removed."""
+    old_keys = ["GONE", "STILL_HERE"]
+    new_vault = {"STILL_HERE": "enc"}
+    summary = snapshot_diff_summary(old_keys, new_vault)
+    assert "- GONE" in summary
+    assert "+ " not in summary
