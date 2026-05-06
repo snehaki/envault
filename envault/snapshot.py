@@ -23,9 +23,14 @@ def load_snapshot(path: Path) -> List[str]:
     """Load a previously saved snapshot; returns [] if file is missing."""
     if not path.exists():
         return []
-    data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Corrupt snapshot at {path}: invalid JSON — {exc}") from exc
     if not isinstance(data, list):
         raise ValueError(f"Corrupt snapshot at {path}: expected a JSON list")
+    if not all(isinstance(k, str) for k in data):
+        raise ValueError(f"Corrupt snapshot at {path}: all entries must be strings")
     return data
 
 
