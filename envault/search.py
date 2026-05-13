@@ -29,6 +29,9 @@ def search_keys(
 
     Returns:
         List of dicts with 'key' and optionally 'value' fields.
+
+    Raises:
+        re.error: If regex is True and pattern is not a valid regular expression.
     """
     entries = vault.get("entries", {})
     results: list[dict] = []
@@ -45,6 +48,7 @@ def search_keys(
     for key, ciphertext in entries.items():
         key_match = _matches_str(key)
         value_match = False
+        plaintext: Optional[str] = None
 
         if search_values:
             try:
@@ -56,9 +60,10 @@ def search_keys(
         if key_match or value_match:
             record: dict = {"key": key}
             if search_values:
-                try:
-                    record["value"] = decrypt(ciphertext, passphrase)
-                except Exception:
+                # Reuse already-decrypted plaintext to avoid a second decrypt call.
+                if plaintext is not None:
+                    record["value"] = plaintext
+                else:
                     record["value"] = "<decryption error>"
             results.append(record)
 
