@@ -57,6 +57,15 @@ def test_dep_remove_missing(runner, vault_file):
     assert "No dependency entry" in result.output
 
 
+def test_dep_remove_clears_from_list(runner, vault_file):
+    """After removing a key, it should no longer appear in 'list' output."""
+    _run(runner, vault_file, "set", "X", "Y")
+    _run(runner, vault_file, "remove", "X")
+    result = _run(runner, vault_file, "list")
+    assert result.exit_code == 0
+    assert "X" not in result.output
+
+
 def test_dep_dependents_shows_reverse(runner, vault_file):
     _run(runner, vault_file, "set", "APP", "HOST")
     result = _run(runner, vault_file, "dependents", "HOST")
